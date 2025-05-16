@@ -4,13 +4,9 @@ import com.fragrance.raumania.dto.request.user.CreateUserRequest;
 import com.fragrance.raumania.dto.request.user.UpdatePasswordRequest;
 import com.fragrance.raumania.dto.request.user.UpdateUserRequest;
 import com.fragrance.raumania.dto.response.ApiResponse;
-import com.fragrance.raumania.dto.response.PageResponse;
-import com.fragrance.raumania.exception.ResourceNotFoundException;
 import com.fragrance.raumania.service.interfaces.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -68,21 +64,11 @@ public class UserController {
 
     @PutMapping("/update-password")
     public ResponseEntity<?> updatePassword(@Valid @RequestBody UpdatePasswordRequest request) {
-        try {
             userService.updateMyPassword(request);
             return ResponseEntity.ok(
-                    new ApiResponse<>(200, "Password updated successfully", null)
+                    new ApiResponse<>(200, "Password updated successfully")
             );
-        } catch (BadRequestException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse<>(400, ex.getMessage(), null));
-        } catch (ResourceNotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(404, ex.getMessage(), null));
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(500, "An unexpected error occurred", null));
-        }
+
     }
 
 

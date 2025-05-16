@@ -98,11 +98,11 @@ public class ReviewController {
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getAllReviews(@RequestParam(defaultValue = "1") int pageNumber,
-                                                                    @RequestParam(defaultValue = "10") int pageSize,
-                                                                    @RequestParam(defaultValue = "id") String sortBy,
-                                                                    @RequestParam(defaultValue = "asc") String sortDirection,
-                                                                    @RequestParam(required = false) UUID productId,
-                                                                    @RequestParam(required = false) UUID productVariantId) {
+                                            @RequestParam(defaultValue = "10") int pageSize,
+                                            @RequestParam(defaultValue = "id") String sortBy,
+                                            @RequestParam(defaultValue = "asc") String sortDirection,
+                                            @RequestParam(required = false) UUID productId,
+                                            @RequestParam(required = false) UUID productVariantId) {
         ReviewFilter filter = ReviewFilter.builder()
                 .productId(productId)
                 .productVariantId(productVariantId)
@@ -117,12 +117,12 @@ public class ReviewController {
 
     @GetMapping("/filter")
     public ResponseEntity<?> filterReviews(@RequestParam(defaultValue = "1") int pageNumber,
-                                                                    @RequestParam(defaultValue = "10") int pageSize,
-                                                                    @RequestParam(defaultValue = "id") String sortBy,
-                                                                    @RequestParam(defaultValue = "asc") String sortDirection,
-                                                                    @RequestParam(required = false) Integer rating,
-                                                                    @RequestParam(required = false) UUID productId,
-                                                                    @RequestParam(required = false) UUID productVariantId) {
+                                            @RequestParam(defaultValue = "10") int pageSize,
+                                            @RequestParam(defaultValue = "id") String sortBy,
+                                            @RequestParam(defaultValue = "asc") String sortDirection,
+                                            @RequestParam(required = false) Integer rating,
+                                            @RequestParam(required = false) UUID productId,
+                                            @RequestParam(required = false) UUID productVariantId) {
 
         ReviewFilter filter = ReviewFilter.builder()
                 .rating(rating)

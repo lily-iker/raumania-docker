@@ -28,36 +28,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINT = {
-            // API Documentation
-            "/v3/api-docs/**",       // OpenAPI docs
-            "/swagger-ui/**",        // Swagger UI resources
-            "/swagger-ui.html",      // Swagger UI main page
-            "/webjars/**",           // Optional: if Swagger uses webjars
-
-            // Authentication endpoints
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/webjars/**",
             "/api/auth/**",
-
-            // Chatbot endpoints
             "api/chatbot/**",
-
-            // Public product endpoints (GET only)
-            "/api/product-variant/**",
-            "/api/product/all",
-            "/api/product/search",
-
-            // Public brand endpoints (GET only)
-            "/api/brand",
-            "/api/brand/search",
-            "/api/brand/*"           // Single brand by ID
     };
 
     private final String[] ADMIN_ENDPOINTS = {
-            "/api/product",          // POST - create product
-            "/api/product/*",        // PUT, DELETE - update/delete product
-            "/api/brand",            // POST - create brand
-            "/api/brand/*",          // PUT, DELETE - update/delete brand
-            "/api/user/all",         // GET - get all users
-            "/api/cart/user/**"      // Admin cart management for users
+            "/api/cart/user/**",
+            "/api/orders",
+            "/api/orders/{orderId}",
+            "/api/admin/dashboard/**",
+            "/api/user/{id}",
+            "/api/user/all",
+            "/api/user",
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -68,10 +54,23 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.GET, "/api/product/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/brand/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/product-variant/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/review/**").permitAll()
                         .requestMatchers(PUBLIC_ENDPOINT).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/product/*").permitAll() // Allow GET for product details
-                        .requestMatchers(HttpMethod.GET, "/api/brand/*").permitAll() // Allow GET for brand details
+
+                        .requestMatchers(HttpMethod.POST, "/api/product/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/product/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/product/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/brand/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/brand/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/brand/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/product-variant/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/product-variant/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/product-variant/**").hasRole("ADMIN")
                         .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
+
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

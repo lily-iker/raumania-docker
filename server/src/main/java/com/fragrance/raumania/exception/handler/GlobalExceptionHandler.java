@@ -111,26 +111,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e,
                                                                WebRequest request) {
-        String message;
-        if (e.getMessage().contains("Gender")) message = "Gender can only be: male, female, other";
-        else if (e.getMessage().contains("Role")) message = "Invalid Role";
-        else if (e.getMessage().contains("Permission")) message = "Invalid Permission";
-        else {
-            // Optional: if more enum required
-            message = e.getMessage();
-        }
-
-        return createApiErrorResponse(HttpStatus.BAD_REQUEST, message, request);
+        return createApiErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 
-//    @ExceptionHandler(Exception.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ApiErrorResponse handleException(Exception e, WebRequest request) {
-//        if (e.getCause() == null) {
-//            return createApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), request);
-//        }
-//        return createApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getCause().getMessage(), request);
-//    }
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiErrorResponse handleException(Exception e, WebRequest request) {
+        if (e.getCause() == null) {
+            return createApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), request);
+        }
+        return createApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getCause().getMessage(), request);
+    }
 
 }
 

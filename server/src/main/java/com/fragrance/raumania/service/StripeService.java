@@ -21,6 +21,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ public class StripeService {
     private final OrderService orderService;
     private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
+
     @Value("${stripe.secretKey}")
     private String secretKey;
 
@@ -42,7 +44,7 @@ public class StripeService {
     @Value("${stripe.cancel-url}")
     private String stripeCancelUrl;
 
-    public StripeResponse createPaymentFromOrder(CreatePaymentRequest createPaymentRequest) {
+    public StripeResponse<?> createPaymentFromOrder(CreatePaymentRequest createPaymentRequest) {
         Stripe.apiKey = secretKey;
 
         Order order = orderRepository.findById(createPaymentRequest.getOrderId())
@@ -86,7 +88,6 @@ public class StripeService {
         try {
             session = Session.create(params);
         } catch (StripeException e) {
-            e.printStackTrace();
             return StripeResponse
                     .builder()
                     .status(String.valueOf(PaymentStatus.FAILED))
@@ -193,6 +194,27 @@ public class StripeService {
         }
 
         return lineItems;
+    }
+
+    public String verifyPayment(@RequestParam String session_id) {
+        try {
+            Stripe.apiKey = secretKey;
+            Session session = Session.retrieve(session_id);
+
+            if ("paid".equals(session.getPaymentStatus())) {
+                String orderIdString = session.getMetadata().get("order_id");
+                System.out.println("Order ID from session metadata: " + orderIdString);
+                if (orderIdString != null) {
+                    UUID orderId = UUID.fromString(orderIdString);
+
+                    updateOrderPaymentStatus(orderId, PaymentStatus.COMPLETED);
+                    updatePaymentEntityStatus(orderId, PaymentStatus.COMPLETED);
+                }
+            }
+        } catch (StripeException e) {
+            return "Error verifying payment.";
+        }
+        return "Payment successful, order updated.";
     }
 
     @Transactional

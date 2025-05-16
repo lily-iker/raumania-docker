@@ -6,7 +6,6 @@ import com.fragrance.raumania.dto.request.user.UpdateUserRequest;
 import com.fragrance.raumania.dto.response.PageResponse;
 import com.fragrance.raumania.dto.response.user.MyInfoResponse;
 import com.fragrance.raumania.dto.response.user.UserResponse;
-import org.apache.coyote.BadRequestException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ public interface UserService {
     UserResponse getUserById(UUID id);
     UserResponse updateUser(UUID id, UpdateUserRequest request);
     UUID deleteUser(UUID id);
-    void updateMyPassword(UpdatePasswordRequest request) throws BadRequestException;
+    void updateMyPassword(UpdatePasswordRequest request);
 
     PageResponse<?> getAllUsers(int pageNumber, int pageSize, String sortBy, String sortDirection);
     PageResponse<?> searchUsers(int pageNumber, int pageSize, String sortBy, String sortDirection, String name);

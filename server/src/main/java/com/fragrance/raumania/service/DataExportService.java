@@ -24,13 +24,13 @@ public class DataExportService {
 
     private static final String UPLOAD_DIR = "/app/uploads";
 
-    @Scheduled(cron = "*/60 * * * * *") // 60 seconds
+    @Scheduled(cron = "0 0 2 * * *") // Runs every day at 02:00:00 AM
     public void cronjob() {
         exportData("product.json", productIndexService.getAllForDataExport());
         exportData("brand.json", brandService.getAllForDataExport());
     }
 
-    private void exportData(String fileName, Object data) {
+    public void exportData(String fileName, Object data) {
         File uploadDir = new File(UPLOAD_DIR);
         if (!uploadDir.exists()) uploadDir.mkdirs();
 
@@ -44,7 +44,7 @@ public class DataExportService {
         }
     }
 
-    private void exportData(String fileName, PageResponse<?> data) {
+    public void exportData(String fileName, PageResponse<?> data) {
         File uploadDir = new File(UPLOAD_DIR);
         if (!uploadDir.exists()) uploadDir.mkdirs();
 

@@ -29,7 +29,7 @@ public class ChatService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
 
-        ChatBotResponse response = null;
+        ChatBotResponse response;
         try {
             response = restTemplate.postForObject(chatbotUrl + "/ask", request, ChatBotResponse.class);
         } catch (Exception e) {

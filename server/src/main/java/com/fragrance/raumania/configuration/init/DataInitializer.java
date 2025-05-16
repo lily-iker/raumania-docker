@@ -6,15 +6,15 @@ import com.fragrance.raumania.model.authorization.Role;
 import com.fragrance.raumania.model.product.*;
 import com.fragrance.raumania.model.user.User;
 import com.fragrance.raumania.repository.*;
+import com.fragrance.raumania.service.DataExportService;
+import com.fragrance.raumania.service.interfaces.BrandService;
+import com.fragrance.raumania.service.interfaces.ProductIndexService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +29,10 @@ public class DataInitializer {
     private final ReviewRepository reviewRepository;
     private final ProductDocumentRepository productDocumentRepository;
     private final ProductMapper productMapper;
+    private final ProductImageRepository productImageRepository;
+    private final DataExportService dataExportService;
+    private final ProductIndexService productIndexService;
+    private final BrandService brandService;
 
     @PostConstruct
     public void initData() {
@@ -38,6 +42,7 @@ public class DataInitializer {
         initProductsAndVariants();
         initReviews();
         initProductDocuments();
+        exportDataForChatbot();
     }
 
     public void initRoles() {
@@ -98,61 +103,202 @@ public class DataInitializer {
     }
 
     public void initProductsAndVariants() {
-        Brand skibidiBrand = brandRepository.findByName("Skibidi Toilet")
-                .orElseThrow(() -> new IllegalStateException("Brand not found"));
+        List<Brand> brands = brandRepository.findAll();
 
-        List<Product> products = List.of(
-                Product.builder()
-                        .name("Mystic Essence")
-                        .description("A captivating fragrance with a delicate balance of rare floral notes and subtle warm accents. This enchanting scent evokes mystery and sophistication, making it perfect for those special occasions where you want to leave a lasting impression.")
-                        .productMaterial("Artisan ingredients and rare essences")
-                        .inspiration("Inspired by the mysteries of the universe")
-                        .usageInstructions("Apply sparingly on pulse points for a lasting aroma")
-                        .thumbnailImage("mystic_essence.jpg")
-                        .isActive(true)
-                        .brand(skibidiBrand)
-                        .build(),
-                Product.builder()
-                        .name("Velvet Bloom")
-                        .description("An enchanting fusion of fresh blooms and dewy petals, Velvet Bloom captures the essence of a garden in full splendor at the break of dawn. Its floral and invigorating aroma inspires feelings of rejuvenation and subtle elegance.")
-                        .productMaterial("Fresh petals and natural extracts")
-                        .inspiration("Inspired by blooming gardens in the spring")
-                        .usageInstructions("Spray lightly over the body for even coverage")
-                        .thumbnailImage("velvet_bloom.jpg")
-                        .isActive(true)
-                        .brand(skibidiBrand)
-                        .build(),
-                Product.builder()
-                        .name("Amber Whisper")
-                        .description("A warm and woody fragrance that envelops you in an aura of sophistication. Amber Whisper artfully blends rich amber with hints of spice and smokiness, creating a timeless olfactory experience that evolves throughout the day.")
-                        .productMaterial("Rich resins and amber oils")
-                        .inspiration("Inspired by ancient traditions")
-                        .usageInstructions("Apply on wrists and neck and reapply as needed")
-                        .thumbnailImage("amber_whisper.jpg")
-                        .isActive(true)
-                        .brand(skibidiBrand)
-                        .build(),
-                Product.builder()
-                        .name("Ocean Breeze")
-                        .description("Dive into the refreshing embrace of Ocean Breeze, a cool and invigorating fragrance reminiscent of a gentle sea spray. With hints of salt and citrus mingling perfectly, this scent transports you to a calming coastal escape.")
-                        .productMaterial("Marine extracts and essential minerals")
-                        .inspiration("Inspired by the endless ocean")
-                        .usageInstructions("Apply after a shower for a refreshing effect")
-                        .thumbnailImage("ocean_breeze.jpg")
-                        .isActive(true)
-                        .brand(skibidiBrand)
-                        .build(),
-                Product.builder()
-                        .name("Golden Spice")
-                        .description("Golden Spice is an intoxicating blend of exotic oriental spices and luxurious aromas. It evokes memories of ancient spice routes and rich traditions, delivering a bold yet refined fragrance that captivates the senses.")
-                        .productMaterial("Exotic spices, rich musk, and rare resins")
-                        .inspiration("Inspired by ancient spice routes and oriental traditions")
-                        .usageInstructions("A little goes a long way; apply sparingly")
-                        .thumbnailImage("golden_spice.jpg")
-                        .isActive(true)
-                        .brand(skibidiBrand)
-                        .build()
+        List<Product> products = new ArrayList<>();
+
+        String[] names = {
+                "Mystic Essence", "Velvet Bloom", "Amber Whisper", "Ocean Breeze", "Golden Spice",
+                "Crimson Dusk", "Silver Mist", "Twilight Fern", "Lunar Petal", "Sunlit Amber",
+                "Ivory Sands", "Noir Blossom", "Azure Mist", "Opal Dream", "Scarlet Haven",
+                "Emerald Glow", "Golden Horizon", "Celestial Muse", "Winter Citrus", "Orchid Mirage",
+                "Radiant Bloom", "Dusky Rose", "Amber Twilight", "Frosted Bloom", "Velvet Sunrise",
+                "Serene Waters", "Wild Citrus", "Hidden Garden", "Coral Whisper", "Midnight Silk",
+                "Aurora Veil", "Amber Lush", "Dewy Bloom", "Rose Cascade", "Tropical Kiss", "Savannah Air"
+        };
+
+        String[] descriptions = {
+                "A captivating fragrance with a delicate balance of rare floral notes and warm accents.",
+                "An enchanting fusion of fresh blooms and dewy petals capturing the essence of spring.",
+                "A warm and woody fragrance that envelops you in sophistication and intrigue.",
+                "Dive into a refreshing scent reminiscent of a cool ocean breeze and salt spray.",
+                "An intoxicating blend of exotic spices and luxurious oriental aromas.",
+                "A delicate mist of silvered florals and soft musky undertones.",
+                "A vibrant green note with fern, herbs, and morning dew.",
+                "Soft petals kissed by moonlight, subtle and deeply romantic.",
+                "Warm amber meets golden sands in this radiant blend.",
+                "Soft citrus blooms with creamy undertones, perfect for daily wear.",
+                "Crushed ivory petals with touches of sunlight and warmth.",
+                "Dark flowers and mysterious musk for an unforgettable evening.",
+                "Crisp ocean mist entwined with light florals for a breezy finish.",
+                "Dreamy florals in a shimmering, otherworldly blend.",
+                "A lush, crimson bouquet wrapped in vanilla whispers.",
+                "Rich emerald leaves crushed with a hint of sweet neroli.",
+                "Sun-warmed spices blended with rare aromatic woods.",
+                "Star-kissed petals and golden woods for an ethereal scent.",
+                "Refreshing citrus touched by winter snowflakes.",
+                "Orchids wrapped in velvety amber sweetness.",
+                "Radiant fields of flowers under a sunny sky.",
+                "A dusky, mysterious rose with hints of oud.",
+                "Deep amber with fleeting touches of jasmine.",
+                "Frosted petals mingling with crisp, icy air.",
+                "A gentle sunrise captured in a velvet floral bouquet.",
+                "Serene aquatic notes blended with soft white musk.",
+                "Zesty citrus with hints of wild greenery.",
+                "Hidden garden blossoms with secret, spicy trails.",
+                "Coral petals dipped in fresh morning mist.",
+                "Smooth silk touched by midnight blossoms.",
+                "The colors of the aurora captured in perfumed elegance.",
+                "Golden amber layered with lush florals.",
+                "Morning dew and delicate blooms dancing together.",
+                "A cascading river of roses and crystal-clear waters.",
+                "Tropical fruits and lush florals intertwining gracefully.",
+                "Wild grasses and sun-warmed fields in a summer breeze."
+        };
+
+        String[] materials = {
+                "Artisan ingredients and rare essences",
+                "Fresh petals and natural extracts",
+                "Rich resins and amber oils",
+                "Marine extracts and essential minerals",
+                "Exotic spices and rare resins",
+                "Silvered florals and misty musk",
+                "Green herbs and dewy leaves",
+                "Velvet petals and lunar drops",
+                "Amber crystals and golden woods",
+                "Citrus zest and creamy petals"
+        };
+
+        String[] inspirations = {
+                "Inspired by the mysteries of the universe",
+                "Inspired by blooming gardens in the spring",
+                "Inspired by ancient traditions",
+                "Inspired by the endless ocean",
+                "Inspired by ancient spice routes and oriental traditions",
+                "Inspired by moonlit nights and silver skies",
+                "Inspired by lush green forests",
+                "Inspired by secret midnight gardens",
+                "Inspired by sunlit beaches",
+                "Inspired by crisp mountain air"
+        };
+
+        String[] usageInstructions = {
+                "Apply sparingly on pulse points for a lasting aroma",
+                "Spray lightly over the body for even coverage",
+                "Apply on wrists and neck and reapply as needed",
+                "Apply after a shower for a refreshing effect",
+                "A little goes a long way; apply sparingly"
+        };
+
+        List<String> randomImages = List.of(
+                "https://fimgs.net/mdimg/news/en/22537/social.22537-1024x536.jpg?t=1745778302",
+                "https://fimgs.net/mdimg/news/en/22520/social.22520-1024x536.jpg?t=1745537255",
+                "https://fimgs.net/mdimg/news/en/22510/social.22510-1024x536.jpg?t=1745425936",
+                "https://fimgs.net/mdimg/news/en/22517/social.22517-1024x536.jpg?t=1745528406",
+                "https://fimgs.net/mdimg/news/en/22537/social.22537-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22516/social.22516-1024x536.jpg?t=1745511302",
+                "https://fimgs.net/mdimg/news/en/22514/social.22514-1024x536.jpg?t=1745496902",
+                "https://fimgs.net/mdimg/news/en/22534/social.22534-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22524/social.22524-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22523/social.22523-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22521/social.22521-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22519/social.22519-1024x536.jpg?t=1745533382",
+                "https://fimgs.net/mdimg/news/en/22519/social.22519-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22525/social.22525-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22532/social.22532-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22514/social.22514-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22526/social.22526-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22529/social.22529-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22517/social.22517-1024x536.jpg",
+                "https://fimgs.net/mdimg/news/en/22516/social.22516-1024x536.jpg",
+                "https://fimgs.net/photogram/p640/ud/qj/wzEf8ceuYHb48xXM.jpg",
+                "https://fimgs.net/photogram/p640/81/0l/aFbA31rq5TVp6PpG.jpg",
+                "https://fimgs.net/photogram/p640/lf/j7/r0b0JM9Ch0x5hXUx.jpg",
+                "https://fimgs.net/photogram/p640/ok/0i/BiJYUXy0vFhQOkS8.jpg",
+                "https://fimgs.net/photogram/p640/vu/pr/IjYxKokE6rHwOn6g.jpg",
+                "https://fimgs.net/mdimg/news/en/22524/social.22524-640x335.jpg?t=1745599044",
+                "https://fimgs.net/mdimg/news/en/22529/social.22529-640x335.jpg?t=1745676782",
+                "https://fimgs.net/mdimg/news/en/22531/social.22531-640x335.jpg",
+                "https://fimgs.net/mdimg/news/en/22521/social.22521-640x335.jpg?t=1745544241",
+                "https://fimgs.net/mdimg/news/en/22520/social.22520-640x335.jpg",
+                "https://fimgs.net/mdimg/news/en/22519/social.22519-640x335.jpg",
+                "https://fimgs.net/mdimg/news/en/22521/social.22521-640x335.jpg",
+                "https://fimgs.net/mdimg/news/en/22529/social.22529-640x335.jpg",
+                "https://fimgs.net/mdimg/news/en/22517/social.22517-640x335.jpg",
+                "https://fimgs.net/mdimg/news/en/22533/social.22533-640x335.jpg",
+                "https://fimgs.net/mdimg/news/en/22537/social.22537-640x335.jpg",
+                "https://fimgs.net/mdimg/news/en/22526/social.22526-640x335.jpg",
+                "https://theme.hstatic.net/1000340570/1000964732/14/img-smb-gift.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/img-smb-niche.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/img-smb-nu.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner_brand_image_section_01.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner_brand_image_section_03.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner-nu-desk.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner-nam-desk.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner-niche-desk.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner_image_section_02.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner_image_section_03.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_bodyhomecare_1.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_nu_2.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_nam_2.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_nam_3.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_brand_1.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_nu_3.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_brand_3.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_nu_1.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_nam_1.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/menu_hover_brand_2.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner-niche-mob.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner-nu-mob.jpg?v=6998",
+                "https://theme.hstatic.net/1000340570/1000964732/14/banner-nam-mob.jpg?v=6998",
+                "https://product.hstatic.net/1000340570/product/tommy_hilfiger_edt_57f62edaa1d8422fa3b0c11171f7fa7c_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/dsquared2-icon-pour-homme_614e728ebee040f1a2aeed2ac78380af_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/gio-trang-100ml_8d628d81bf53494eaccf931159e7432f_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/dsquared2-icon-pour-femme_497b41b8f9c24158986ab5a219cfe7b0_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/versace-eros-for-men_e21f596ba1f6467eb39ace8813943882_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/versace-bright-crystal_405b9f59113d48dea5e79fd1dd3a99e9_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/kich-thuoc_10791e64a61e43fd8668d7294b88e6b4_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/giorgio-armani-acqua-di-gioia-intense_3bd0ce1c7a6e4ab09050dc491ee677e5_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/kich-thuoc_7f2119ebaa5b40b4a1c7949873b9eb04_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/marc-jacobs-eau-so-fresh-mini-size_351a28fbaa354352b26b440bc660d5ee_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/versace-pour-homme_aac4a84bdbdf400fb3140f176b64373a_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/mini-moi_59ec6273d0b643808b82ad3f12658104_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/gucci-magnolia-mini-size_af0210969fad4cbb83dc38a0508377f1_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/gucci-flora-gorgeous-jasmine-mini-size_2dfddfdb0b734a1298e4542938354742_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/gucci-bloom-eau-de-parfum_eb88a1912db246a48d4bdc1be06aa807_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/dylan_90ca7824913645f08e621adb9299950b_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/sig-edp_5520e41e042a4fa4a7757fd0d4d202bb_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/toy-2_e8763e1a84c740abbec90c909ddc4ed5_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/gucci-bloom_02f6ff28224143c6a358b788b3e4911c_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/flam_28e70e4357b44e38820431a9e7d0b3b0_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/vsph_aecdee029ccf43e9992be08c88374539_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/salvatore_ferragamo_red_leather_399f9a2c9ddd455a96b79592c322b0e5_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/giorgio-armani-code-pour-homme-eau-de-parfum-125ml_f2458c01cabe401fa9a1af2691985912_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/versace-eros-shower-gel_1c22030a52e9422db52e38ec28d05df9_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/tommy_hilfiger_tommy_girl_786135da321a410698aa6c4d3d8c1681_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/nuoc-hoa-paco-rabane-mini-1-million_43e1f19f323f46f0838a996fd68e7ff6_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/versace-pour-homme-hair_-body-shampoo_a0ba709ffcce4ee9941ef853a371a116_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/52cf668d76f149fd9d5f3f411859fad4_ab790b93987f470ab92023c39c492477_grande.jpg",
+                "https://product.hstatic.net/1000340570/product/versace-bright-crystal-perfume-bath-_-shower-gel_ce4e0409f224425eadb4740d5e8c3fcc_grande.jpg"
         );
+
+        Random random = new Random();
+
+        for (int i = 0; i < 36; i++) {
+            Brand randomBrand = brands.get(random.nextInt(brands.size()));
+
+            Product product = Product.builder()
+                    .name(names[i])
+                    .description(descriptions[i])
+                    .productMaterial(materials[random.nextInt(materials.length)])
+                    .inspiration(inspirations[random.nextInt(inspirations.length)])
+                    .usageInstructions(usageInstructions[random.nextInt(usageInstructions.length)])
+                    .thumbnailImage(randomImages.get(random.nextInt(randomImages.size())))
+                    .isActive(true)
+                    .brand(randomBrand)
+                    .build();
+            products.add(product);
+        }
 
         products.forEach(product -> {
             Optional<Product> existingProduct = productRepository.findByName(product.getName());
@@ -160,6 +306,18 @@ public class DataInitializer {
             if (existingProduct.isEmpty()) {
                 Product savedProduct = productRepository.save(product);
                 initProductVariants(savedProduct);
+
+                List<ProductImage> images = new ArrayList<>();
+                for (int i = 0; i < 10; i++) {
+                    String randomImageUrl = randomImages.get(random.nextInt(randomImages.size()));
+                    ProductImage productImage = ProductImage.builder()
+                            .image(randomImageUrl)
+                            .product(savedProduct)
+                            .build();
+                    images.add(productImage);
+                }
+                productImageRepository.saveAll(images);
+
                 System.out.println("✅ Product initialized: " + savedProduct.getName());
             } else {
                 System.out.println("ℹ️ Product already exists: " + product.getName());
@@ -170,11 +328,35 @@ public class DataInitializer {
     }
 
     public void initProductVariants(Product product) {
-        List<ProductVariant> variants = List.of(
-                ProductVariant.builder().name(product.getName() + " - Travel Size").size("50ml").scent("Woody Amber").stock(50).price(36.0).product(product).build(),
-                ProductVariant.builder().name(product.getName() + " - Deluxe").size("100ml").scent("Floral Musk").stock(30).price(36.6).product(product).build(),
-                ProductVariant.builder().name(product.getName() + " - Collector’s Edition").size("150ml").scent("Citrus Spice").stock(20).price(36.66).product(product).build()
-        );
+        Random random = new Random();
+
+        String[] variantTypes = {"Travel Size", "Deluxe", "Collector’s Edition", "Signature Edition", "Limited Batch", "Essence Collection"};
+        String[] sizes = {"50ml", "100ml", "150ml"};
+        String[] scents = {"Woody Amber", "Floral Musk", "Citrus Spice", "Ocean Breeze", "Mystic Oud", "Velvet Rose"};
+
+        List<ProductVariant> variants = new ArrayList<>();
+
+        // Create 2 to 4 random variants for each product
+        int variantCount = 2 + random.nextInt(3);
+
+        for (int i = 0; i < variantCount; i++) {
+            String variantName = product.getName() + " - " + variantTypes[random.nextInt(variantTypes.length)];
+            String size = sizes[random.nextInt(sizes.length)];
+            String scent = scents[random.nextInt(scents.length)];
+            double price = 20 + (80 * random.nextDouble()); // Random price between 20 and 100
+            int stock = 20 + random.nextInt(51); // Stock between 20 and 70
+
+            ProductVariant variant = ProductVariant.builder()
+                    .name(variantName)
+                    .size(size)
+                    .scent(scent)
+                    .stock(stock)
+                    .price(Math.round(price * 100.0) / 100.0)
+                    .product(product)
+                    .build();
+
+            variants.add(variant);
+        }
 
         Double minPrice = null;
         Double maxPrice = null;
@@ -216,12 +398,12 @@ public class DataInitializer {
         }
         Product mysticEssence = mysticEssenceOpt.get();
 
-        Optional<ProductVariant> travelSizeVariantOpt = productVariantRepository.findByName("Mystic Essence - Travel Size");
+        List<ProductVariant> travelSizeVariantOpt = productVariantRepository.findAll();
         if (travelSizeVariantOpt.isEmpty()) {
             System.out.println("⚠️ ProductVariant 'Mystic Essence - Travel Size' not found. Skipping review initialization.");
             return;
         }
-        ProductVariant travelSizeVariant = travelSizeVariantOpt.get();
+        ProductVariant travelSizeVariant = travelSizeVariantOpt.get(0);
 
         User adminUser = userRepository.findByUsername("adminadmin")
                 .orElseThrow(() -> new IllegalStateException("User not found"));
@@ -266,5 +448,10 @@ public class DataInitializer {
         // Save all documents at once
         productDocumentRepository.saveAll(productDocuments);
         System.out.println("✅ Product document initialization complete.");
+    }
+
+    public void exportDataForChatbot() {
+        dataExportService.exportData("product.json", productIndexService.getAllForDataExport());
+        dataExportService.exportData("brand.json", brandService.getAllForDataExport());
     }
 }

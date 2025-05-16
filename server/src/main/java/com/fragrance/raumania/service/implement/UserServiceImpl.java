@@ -6,6 +6,7 @@ import com.fragrance.raumania.dto.request.user.UpdateUserRequest;
 import com.fragrance.raumania.dto.response.PageResponse;
 import com.fragrance.raumania.dto.response.user.MyInfoResponse;
 import com.fragrance.raumania.dto.response.user.UserResponse;
+import com.fragrance.raumania.exception.InvalidDataException;
 import com.fragrance.raumania.exception.ResourceNotFoundException;
 import com.fragrance.raumania.mapper.UserMapper;
 import com.fragrance.raumania.model.authorization.Role;
@@ -20,7 +21,6 @@ import com.fragrance.raumania.utils.SortUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateMyPassword(UpdatePasswordRequest request) throws BadRequestException {
+    public void updateMyPassword(UpdatePasswordRequest request) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         User user = (User) securityContext.getAuthentication().getPrincipal();
 
@@ -90,12 +90,12 @@ public class UserServiceImpl implements UserService {
 
         // Validate current password
         if (!passwordEncoder.matches(request.getCurrentPassword(), me.getPassword())) {
-            throw new BadRequestException("Current password is incorrect");
+            throw new InvalidDataException("Current password is incorrect");
         }
 
         // Check if new password and confirm password match
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new BadRequestException("New password and confirm password do not match");
+            throw new InvalidDataException("New password and confirm password do not match");
         }
 
         // Encode and set the new password

@@ -23,8 +23,6 @@ public class Chat extends AbstractAuditingEntity {
 
     private String name;
 
-    private String chatImageUrl;
-
     @Builder.Default
     @OneToMany(mappedBy = "chat")
     private List<Message> messages = new ArrayList<>();
