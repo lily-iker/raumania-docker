@@ -91,16 +91,16 @@ export function Header() {
         </nav>
 
         {/* Desktop Cart Button and Avatar (Hidden on Mobile) */}
-        <div className="col-start-3 justify-self-end hidden md:flex items-center gap-16">
+        <div className="col-start-3 justify-self-end hidden md:flex items-center ~gap-8/16">
           {/* Avatar Dropdown */}
           <div className="relative avatar-dropdown">
             <button
-              className="flex items-center justify-center bg-[#f8f5f1] hover:bg-[#f0e6d6] text-[#d4a6a6] rounded-full size-16 transition-colors"
+              className="flex items-center justify-center bg-[#f8f5f1] hover:bg-[#f0e6d6] text-[#d4a6a6] rounded-full w-14 h-14 transition-colors"
               onClick={() => setAvatarDropdownOpen(!avatarDropdownOpen)}
               aria-expanded={avatarDropdownOpen}
               aria-label="User menu"
             >
-              <FaUser className="size-8" />
+              <FaUser className="w-7 h-7" />
             </button>
 
             {/* Dropdown Menu */}
@@ -142,7 +142,7 @@ export function Header() {
           </div>
 
           {/* Original ButtonLink */}
-          <ButtonLink href="/cart" icon="cart" color="pink" aria-label="Cart" size="lg">
+          <ButtonLink href="/cart" icon="cart" color="pink" aria-label="Cart" size="md">
             {/* Keep original content structure for desktop */}
             <span className="hidden md:inline">Cart</span>
           </ButtonLink>
