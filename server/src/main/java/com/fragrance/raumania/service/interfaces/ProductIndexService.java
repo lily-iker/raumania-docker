@@ -11,16 +11,16 @@ public interface ProductIndexService {
     PageResponse<?> searchName(String name, int pageNumber, int pageSize);
 
     PageResponse<?> elasticsearchProducts(String name,
-                                                 Double minPrice,
-                                                 Double maxPrice,
-                                                 String brandName,
-                                                 Boolean isActive,
-                                                 String size,
-                                                 String scent,
-                                                 int pageNumber,
-                                                 int pageSize,
-                                                 String sortBy,
-                                                 String sortDirection);
+                                         Double minPrice,
+                                         Double maxPrice,
+                                         String brandName,
+                                         Boolean isActive,
+                                         String size,
+                                         String scent,
+                                         int pageNumber,
+                                         int pageSize,
+                                         String sortBy,
+                                         String sortDirection);
 
     PageResponse<?> getAllForDataExport();
 }

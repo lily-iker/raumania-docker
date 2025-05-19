@@ -4,6 +4,7 @@ import {Cormorant_Garamond, Dancing_Script } from "next/font/google";
 import { SVGFilters } from "@/components/SVGFilters";
 import { Header } from "@/components/Header";
 import { Toaster } from "react-hot-toast";
+import ChatBubble from "@/components/chat/chat-bubble";
 
 const cormorant_garamond = Cormorant_Garamond({
   subsets: ['latin'],
@@ -37,6 +38,7 @@ export default function RootLayout({
         <main>
         {children}
         </main>
+        <ChatBubble />
         <SVGFilters  />
         <Toaster />
       </body>

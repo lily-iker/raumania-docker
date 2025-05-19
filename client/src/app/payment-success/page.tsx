@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Bounded } from "@/components/Bounded"
 import { Heading } from "@/components/Heading"
@@ -10,7 +10,8 @@ import useOrderStore from "@/stores/useOrderStore"
 import { useAuthStore } from "@/stores/useAuthStore"
 import { toast } from "react-hot-toast"
 
-export default function PaymentSuccessPage() {
+// Payment content component that uses useSearchParams
+function PaymentContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { verifyStripePayment, isLoading } = useOrderStore()
@@ -41,8 +42,8 @@ export default function PaymentSuccessPage() {
     if (hasVerifiedPayment) return // Prevent multiple verifications
 
     try {
-      const sessionId = searchParams.get("session_id")
-      const orderIdParam = searchParams.get("order_id")
+      const sessionId = searchParams?.get("session_id")
+      const orderIdParam = searchParams?.get("order_id")
 
       if (!sessionId) {
         setVerificationStatus("error")
@@ -193,5 +194,24 @@ export default function PaymentSuccessPage() {
         )}
       </div>
     </Bounded>
+  )
+}
+
+// Main page component
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <Bounded className="min-h-screen bg-brand-cream py-16">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm p-8 text-center">
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-black mb-4"></div>
+            <h2 className="text-xl font-medium">Loading payment status...</h2>
+            <p className="text-gray-500 mt-2">Please wait while we load your payment information.</p>
+          </div>
+        </div>
+      </Bounded>
+    }>
+      <PaymentContent />
+    </Suspense>
   )
 }

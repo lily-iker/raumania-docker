@@ -17,8 +17,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER,  // Email environment variable
-      pass: process.env.EMAIL_PASS,  // Password environment variable
+      user: process.env.EMAIL_USER, // Email environment variable
+      pass: process.env.EMAIL_PASS, // Password environment variable
     },
   })
 
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await transporter.sendMail({
       from: `"Raumania Fragrance" <${process.env.EMAIL_USER}>`,
       replyTo: senderEmail,
-      to: 'minhthai030896@gmail.com',  // Admin email to receive the customization details
+      to: 'minhthai030896@gmail.com', // Admin email to receive the customization details
       subject: 'New Custom Fragrance Submission',
       html: `
       <div style="background-color: #f4f4f7; padding: 20px; font-family: Arial, sans-serif;">
@@ -66,12 +66,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
         </div>
       </div>
-    `
+    `,
     })
 
     res.status(200).json({ message: 'Email sent successfully' })
   } catch (error) {
-    console.error('Error sending email:', error)  // Log the detailed error for debugging
+    console.error('Error sending email:', error) // Log the detailed error for debugging
     res.status(500).json({ error: 'Email failed to send' })
   }
 }

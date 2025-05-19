@@ -11,7 +11,7 @@ import toast from "react-hot-toast"
 export default function ProductVariantDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const variantId = params.id as string
+  const variantId = params?.id as string
 
   const { selectedVariant, getProductVariantById, clearSelectedVariant } = useProductVariantStore()
   const [isLoading, setIsLoading] = useState(true)

@@ -11,6 +11,9 @@ import com.fragrance.raumania.service.interfaces.BrandService;
 import com.fragrance.raumania.service.interfaces.ProductIndexService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +45,12 @@ public class DataInitializer {
         initProductsAndVariants();
         initReviews();
         initProductDocuments();
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    @Async
+    public void exportDataForChatbotEventListener() throws InterruptedException {
+        Thread.sleep(10000);
         exportDataForChatbot();
     }
 
@@ -451,7 +460,9 @@ public class DataInitializer {
     }
 
     public void exportDataForChatbot() {
+        System.out.println("Exporting product.json...");
         dataExportService.exportData("product.json", productIndexService.getAllForDataExport());
+        System.out.println("Exporting brand.json...");
         dataExportService.exportData("brand.json", brandService.getAllForDataExport());
     }
 }

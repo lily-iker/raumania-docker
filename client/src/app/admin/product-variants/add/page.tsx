@@ -18,7 +18,7 @@ import type { CreateProductVariantRequest } from "@/types/product-variant"
 export default function AddProductVariantPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const productId = searchParams.get("productId")
+  const productId = searchParams?.get("productId")
 
   const { createProductVariant, isLoading } = useProductVariantStore()
   // Replace the line with getProductById with fetchProductById

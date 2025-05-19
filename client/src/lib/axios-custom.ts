@@ -1,10 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL
 
 const instance = axios.create({
   baseURL: baseURL,
-  withCredentials: true
+  withCredentials: true,
 })
 
 export function getCookie(name: string) {

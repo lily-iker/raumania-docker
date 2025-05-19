@@ -31,7 +31,7 @@ export default function UsersPage() {
   const [sortDirection, setSortDirection] = useState<string>("asc")
 
   // Get query params
-  const pageNumber = Number(searchParams.get("page") || "1")
+  const pageNumber = Number(searchParams?.get("page") || "1")
 
   // Fetch users on mount and when params change
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function UsersPage() {
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return
 
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
     params.set("page", page.toString())
     router.push(`/admin/users?${params.toString()}`)
   }

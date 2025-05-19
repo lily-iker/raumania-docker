@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useAuthStore } from "@/stores/useAuthStore"
 
-export default function ResetPasswordPage() {
+// Reset password content component that uses useSearchParams
+function ResetPasswordContent() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [token, setToken] = useState("")
@@ -20,7 +20,7 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     // Get token from URL query parameter
-    const tokenParam = searchParams.get("token")
+    const tokenParam = searchParams?.get("token")
     if (tokenParam) {
       setToken(tokenParam)
     } else {
@@ -155,6 +155,36 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Main page component
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen w-full overflow-hidden font-sans">
+        <div className="relative flex w-full items-center justify-center bg-white lg:w-[55%]">
+          <div className="w-[450px] px-8 text-center">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-black mx-auto mb-4"></div>
+            <p className="text-xl text-gray-500">Loading reset password form...</p>
+          </div>
+        </div>
+        <div className="hidden lg:block lg:w-[45%]">
+          <div className="relative h-full w-full">
+            <Image
+              src="https://res.cloudinary.com/dp67bxzbf/image/upload/v1743866867/login-image_vhmwym.jpg"
+              alt="Cartier storefront with vintage red Porsche"
+              width={1200}
+              height={1200}
+              priority
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }
 

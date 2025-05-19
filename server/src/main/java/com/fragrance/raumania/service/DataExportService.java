@@ -24,7 +24,7 @@ public class DataExportService {
 
     private static final String UPLOAD_DIR = "/app/uploads";
 
-    @Scheduled(cron = "0 0 2 * * *") // Runs every day at 02:00:00 AM
+    @Scheduled(cron = "0 0 2 * * *") // Runs every day at 2AM
     public void cronjob() {
         exportData("product.json", productIndexService.getAllForDataExport());
         exportData("brand.json", brandService.getAllForDataExport());

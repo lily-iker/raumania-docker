@@ -101,11 +101,7 @@ export default function Home() {
         return null
       })}
 
-      {relatedProducts.length > 0 && (
-        <div className="bg-texture bg-brand-cream py-16">
-          <RelatedProducts relatedProducts={relatedProducts} />
-        </div>
-      )}
+    
 
       <VideoBlock youtubeID="VllN0yINA5A" />
 

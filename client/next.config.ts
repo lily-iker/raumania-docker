@@ -1,9 +1,6 @@
-import type { NextConfig } from "next";
+// import type { NextConfig } from 'next'
 
-const nextConfig: NextConfig = {
-  images: {
-    domains: ["res.cloudinary.com", "hebbkx1anhila5yf.public.blob.vercel-storage.com"],
-  },
-};
+// const nextConfig: NextConfig = {
+// }
 
-export default nextConfig;
+// export default nextConfig

@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Eye, ChevronLeft, ChevronRight, Calendar, DollarSign, Package2 } from "lucide-react"
 import type { OrderPaginationParams } from "@/types/pagination"
 import useOrderStore from "@/stores/useOrderStore"
-import { useAuthStore } from "@/stores/useAuthStore" // Import the auth store
+import { useAuthStore } from "@/stores/useAuthStore"
 import { Header } from "@/components/Header"
 import { NormalFooter } from "@/components/NormalFooter"
 import clsx from "clsx"
@@ -21,7 +21,8 @@ const formatDate = (dateString: string | Date) => {
   })
 }
 
-export default function OrdersPage() {
+// Orders content component that uses useSearchParams
+function OrdersContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const {
@@ -34,7 +35,7 @@ export default function OrdersPage() {
     error,
     fetchMyOrders,
   } = useOrderStore()
-  const { authUser, isLoading: authLoading, fetchAuthUser } = useAuthStore() // Get auth state
+  const { authUser, isLoading: authLoading, fetchAuthUser } = useAuthStore()
 
   const [sortField, setSortField] = useState<string>("createdAt,desc")
   const [isAuthChecked, setIsAuthChecked] = useState(false)
@@ -278,5 +279,26 @@ export default function OrdersPage() {
       </div>
       <NormalFooter />
     </>
+  )
+}
+
+// Main page component
+export default function OrdersPage() {
+  return (
+    <Suspense fallback={
+      <>
+        <Header />
+        <div className="h-24 md:h-32 bg-brand-gray" />
+        <div className="min-h-screen bg-brand-gray p-6 md:p-8 lg:p-12 font-cormorant text-brand-purple flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-brand-purple border-t-brand-orange"></div>
+            <p className="mt-4 text-xl text-brand-purple/70">Loading your orders...</p>
+          </div>
+        </div>
+        <NormalFooter />
+      </>
+    }>
+      <OrdersContent />
+    </Suspense>
   )
 }

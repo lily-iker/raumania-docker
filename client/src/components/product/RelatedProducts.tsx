@@ -114,7 +114,7 @@ export function RelatedProducts({ relatedProducts: initialProducts = [] }: Relat
       )}
 
       <div className="mt-12 text-center">
-        <ButtonLink href="/shop" color="orange">
+        <ButtonLink href="/search" color="purple">
           View All Products
         </ButtonLink>
       </div>

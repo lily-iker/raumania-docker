@@ -142,8 +142,8 @@ public class ProductController {
 
     @GetMapping("/search-name")
     public ResponseEntity<?> elasticsearchProductsName(@RequestParam String name,
-                                                                                   @RequestParam(defaultValue = "0") int pageNumber,
-                                                                                   @RequestParam(defaultValue = "5") int pageSize) {
+                                                       @RequestParam(defaultValue = "0") int pageNumber,
+                                                       @RequestParam(defaultValue = "5") int pageSize) {
         return ResponseEntity.ok(
                 new ApiResponse<>(200,
                         "Search products name retrieved successfully",
@@ -153,16 +153,16 @@ public class ProductController {
 
     @GetMapping("/search-es")
     public ResponseEntity<?> elasticsearchProducts(@RequestParam(defaultValue = "1") int pageNumber,
-                                            @RequestParam(defaultValue = "6") int pageSize,
-                                            @RequestParam(defaultValue = "id") String sortBy,
-                                            @RequestParam(defaultValue = "asc") String sortDirection,
-                                            @RequestParam(required = false) String name,
-                                            @RequestParam(required = false) Double minPrice,
-                                            @RequestParam(required = false) Double maxPrice,
-                                            @RequestParam(required = false) String brandName,
-                                            @RequestParam(required = false) Boolean isActive,
-                                            @RequestParam(required = false) String size,
-                                            @RequestParam(required = false) String scent) {
+                                                    @RequestParam(defaultValue = "6") int pageSize,
+                                                    @RequestParam(defaultValue = "id") String sortBy,
+                                                    @RequestParam(defaultValue = "asc") String sortDirection,
+                                                    @RequestParam(required = false) String name,
+                                                    @RequestParam(required = false) Double minPrice,
+                                                    @RequestParam(required = false) Double maxPrice,
+                                                    @RequestParam(required = false) String brandName,
+                                                    @RequestParam(required = false) Boolean isActive,
+                                                    @RequestParam(required = false) String size,
+                                                    @RequestParam(required = false) String scent) {
         return ResponseEntity.ok(
                 new ApiResponse<>(200,
                         "Search and filtered products retrieved successfully",

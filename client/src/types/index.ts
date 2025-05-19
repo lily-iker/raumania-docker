@@ -60,8 +60,8 @@ interface RelatedProduct {
   price: number
   imageUrl: string
   thumbnailImage: string
-  minPrice?: number; // If applicable
-  maxPrice?: number; // If applicable
+  minPrice?: number; 
+  maxPrice?: number; 
 }
 
 export interface Product {

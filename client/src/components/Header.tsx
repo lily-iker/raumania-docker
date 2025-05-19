@@ -1,14 +1,14 @@
-"use client" // Required because we're using useState
+'use client' // Required because we're using useState
 
-import Link from "next/link"
-import React, { useState } from "react" // Import useState
-import { ButtonLink } from "./ButtonLink"
-import { Logo } from "./Logo"
-import { FaX } from "react-icons/fa6" // Using react-icons like the example
-import { CgMenu } from "react-icons/cg" // Using react-icons like the example
-import { FaUser, FaShoppingBag, FaSignOutAlt, FaTachometerAlt } from "react-icons/fa" // Added dashboard icon
-import axios from "@/lib/axios-custom"
-import { useAuthStore } from "@/stores/useAuthStore"
+import Link from 'next/link'
+import React, { useState } from 'react' // Import useState
+import { ButtonLink } from './ButtonLink'
+import { Logo } from './Logo'
+import { FaX } from 'react-icons/fa6' // Using react-icons like the example
+import { CgMenu } from 'react-icons/cg' // Using react-icons like the example
+import { FaUser, FaShoppingBag, FaSignOutAlt, FaTachometerAlt } from 'react-icons/fa' // Added dashboard icon
+import axios from '@/lib/axios-custom'
+import { useAuthStore } from '@/stores/useAuthStore'
 
 export function Header() {
   // State to manage mobile menu visibility
@@ -25,27 +25,27 @@ export function Header() {
   }, [fetchAuthUser])
 
   const navigation = [
-    { label: "Home", href: "/" },
-    { label: "Shop", href: "/search" }, // Kept original /search href
-    { label: "Contact", href: "/contact" },
+    { label: 'Home', href: '/' },
+    { label: 'Shop', href: '/search' }, // Kept original /search href
+    { label: 'Contact', href: '/contact' },
   ]
 
   // User menu options - conditionally add admin dashboard if user is admin
   const userMenuOptions = [
-    ...(authUser?.role === "ADMIN"
-      ? [{ label: "Admin Dashboard", href: "/admin", icon: <FaTachometerAlt className="mr-2" /> }]
+    ...(authUser?.role === 'ADMIN'
+      ? [{ label: 'Admin Dashboard', href: '/admin', icon: <FaTachometerAlt className="mr-2" /> }]
       : []),
-    { label: "Profile", href: "/profile", icon: <FaUser className="mr-2" /> },
-    { label: "Orders", href: "/orders", icon: <FaShoppingBag className="mr-2" /> },
+    { label: 'Profile', href: '/profile', icon: <FaUser className="mr-2" /> },
+    { label: 'Orders', href: '/orders', icon: <FaShoppingBag className="mr-2" /> },
   ]
 
   // Logout function
   const handleLogoutAndRedirect = async () => {
     try {
-      await axios.post("/api/auth/logout")
+      await axios.post('/api/auth/logout')
       window.location.reload()
     } catch (error) {
-      console.error("Logout failed", error)
+      console.error('Logout failed', error)
     }
   }
 
@@ -53,14 +53,14 @@ export function Header() {
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
-      if (!target.closest(".avatar-dropdown")) {
+      if (!target.closest('.avatar-dropdown')) {
         setAvatarDropdownOpen(false)
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
 
@@ -79,10 +79,10 @@ export function Header() {
           // Original classes ensuring correct placement on desktop, plus hidden on mobile
           className="col-span-1 col-start-2 row-start-1 hidden md:block"
         >
-          <ul className="flex flex-wrap items-center justify-center gap-8">
+          <ul className="flex flex-wrap items-center justify-center ~gap-8/16">
             {navigation.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="~text-lg/xl hover:underline">
+                <Link href={item.href} className="~text-2xl/3xl hover:underline">
                   {item.label}
                 </Link>
               </li>
@@ -95,12 +95,12 @@ export function Header() {
           {/* Avatar Dropdown */}
           <div className="relative avatar-dropdown">
             <button
-              className="flex items-center justify-center bg-[#f8f5f1] hover:bg-[#f0e6d6] text-[#d4a6a6] rounded-full w-10 h-10 transition-colors"
+              className="flex items-center justify-center bg-[#f8f5f1] hover:bg-[#f0e6d6] text-[#d4a6a6] rounded-full size-16 transition-colors"
               onClick={() => setAvatarDropdownOpen(!avatarDropdownOpen)}
               aria-expanded={avatarDropdownOpen}
               aria-label="User menu"
             >
-              <FaUser className="h-5 w-5" />
+              <FaUser className="size-8" />
             </button>
 
             {/* Dropdown Menu */}
@@ -155,7 +155,7 @@ export function Header() {
           <button
             className="z-50 p-2" // Added padding for easier clicking
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileMenuOpen} // Good for accessibility
           >
             {mobileMenuOpen ? (
@@ -171,7 +171,7 @@ export function Header() {
       {/* Appears only on mobile when mobileMenuOpen is true */}
       <div
         className={`fixed inset-0 z-40 bg-white bg-opacity-95 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
-          mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
         <div className="flex h-full flex-col items-center justify-center">
@@ -202,7 +202,9 @@ export function Header() {
                         className="flex items-center hover:underline"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        {React.cloneElement(option.icon, { className: "mr-2 h-5 w-5 text-[#d4a6a6]" })}
+                        {React.cloneElement(option.icon, {
+                          className: 'mr-2 h-5 w-5 text-[#d4a6a6]',
+                        })}
                         {option.label}
                       </Link>
                     </li>

@@ -153,6 +153,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
+
+        SecurityContextHolder.clearContext();
     }
 
     @Override
@@ -184,6 +186,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Cookie accessTokenCookie = createAccessTokenCookie(accessToken);
 
         response.addCookie(accessTokenCookie);
+
+        SecurityContextHolder.clearContext();
 
         return TokenResponse.builder()
                 .accessToken(accessToken)
@@ -264,7 +268,38 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         String subject = "Here's the link to reset your password";
 
-        String content = "<!DOCTYPE html>" +
+        String content = buildContent(username, link);
+
+        helper.setSubject(subject);
+        helper.setText(content, true);
+
+        mailSender.send(message);
+    }
+
+    private Cookie createAccessTokenCookie(String accessToken) {
+        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setAttribute("SameSite", "Strict");
+        accessTokenCookie.setMaxAge(ACCESS_TOKEN_COOKIE_EXPIRATION);
+
+        return accessTokenCookie;
+    }
+
+    private Cookie createRefreshTokenCookie(String refreshToken) {
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setAttribute("SameSite", "Strict");
+        refreshTokenCookie.setMaxAge(REFRESH_TOKEN_COOKIE_EXPIRATION);
+
+        return refreshTokenCookie;
+    }
+
+    private String buildContent(String username, String link) {
+        return "<!DOCTYPE html>" +
                 "<html lang=\"en\">" +
                 "<head>" +
                 "<meta charset=\"UTF-8\">" +
@@ -340,34 +375,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
                 "</body>" +
                 "</html>";
-
-
-
-        helper.setSubject(subject);
-        helper.setText(content, true);
-
-        mailSender.send(message);
-    }
-
-    private Cookie createAccessTokenCookie(String accessToken) {
-        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setAttribute("SameSite", "Strict");
-        accessTokenCookie.setMaxAge(ACCESS_TOKEN_COOKIE_EXPIRATION);
-
-        return accessTokenCookie;
-    }
-
-    private Cookie createRefreshTokenCookie(String refreshToken) {
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setSecure(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setAttribute("SameSite", "Strict");
-        refreshTokenCookie.setMaxAge(REFRESH_TOKEN_COOKIE_EXPIRATION);
-
-        return refreshTokenCookie;
     }
 }

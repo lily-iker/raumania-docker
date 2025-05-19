@@ -5,10 +5,19 @@ import { SlideIn } from "./SlideIn"
 import { PerfumeProduct } from "./PerfumeProduct"
 import { Product } from "@/types"
 
+
+type ProductGrid = {
+  id: string
+  name: string
+  thumbnailImage: string
+  minPrice: number
+  customizeUrl?: string
+}
+
 export type ProductGridProps = {
   heading: string
   body: string
-  products: Product[]
+  products: ProductGrid[]
 }
 
 const ProductGrid: FC<ProductGridProps> = ({ heading, body, products }) => {

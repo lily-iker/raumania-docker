@@ -184,7 +184,8 @@ public class ProductIndexServiceImpl implements ProductIndexService  {
 
         BoolQuery.Builder b = QueryBuilders.bool();
 
-        PageRequest pageRequest = PageRequest.of(0, Integer.MAX_VALUE);
+        int limit = 10000;
+        PageRequest pageRequest = PageRequest.of(0, limit);
 
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q.bool(b.build()))
@@ -213,7 +214,7 @@ public class ProductIndexServiceImpl implements ProductIndexService  {
                 .totalPages(productPage.getTotalPages())
                 .totalElements(productPage.getTotalElements())
                 .pageNumber(0)
-                .pageSize(Integer.MAX_VALUE)
+                .pageSize(limit)
                 .build();
     }
 

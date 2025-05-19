@@ -14,12 +14,12 @@ export function ProductFilters() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const [name, setName] = useState(searchParams.get("name") || "")
-  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "")
-  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "")
-  const [brandName, setBrandName] = useState(searchParams.get("brandName") || "")
+  const [name, setName] = useState(searchParams?.get("name") || "")
+  const [minPrice, setMinPrice] = useState(searchParams?.get("minPrice") || "")
+  const [maxPrice, setMaxPrice] = useState(searchParams?.get("maxPrice") || "")
+  const [brandName, setBrandName] = useState(searchParams?.get("brandName") || "")
   const [isActive, setIsActive] = useState<string>(
-    searchParams.get("isActive") === "true" ? "true" : searchParams.get("isActive") === "false" ? "false" : "",
+    searchParams?.get("isActive") === "true" ? "true" : searchParams?.get("isActive") === "false" ? "false" : "",
   )
 
   // Add state for brands

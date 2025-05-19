@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { useFragranceCustomizer } from "@/app/build/context"
-import { useAuthStore } from "@/stores/useAuthStore"
-import toast from "react-hot-toast"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { useFragranceCustomizer } from '@/app/build/context'
+import { useAuthStore } from '@/stores/useAuthStore'
+import toast from 'react-hot-toast'
 
 function SubmitButton() {
   const { selectedBottle, selectedColor, selectedScent, selectedCap } = useFragranceCustomizer()
-  const {fetchAuthUser } = useAuthStore()
+  const { fetchAuthUser } = useAuthStore()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
@@ -19,10 +19,10 @@ function SubmitButton() {
     await fetchAuthUser()
     const { authUser: user } = useAuthStore.getState()
 
-    console.log("After fetchAuthUser:", user)
+    console.log('After fetchAuthUser:', user)
 
     if (!user?.email) {
-      toast('You must be logged in to submit a design.', { icon: '⚠️' });      
+      toast('You must be logged in to submit a design.', { icon: '⚠️' })
       return
     }
 
@@ -45,6 +45,7 @@ function SubmitButton() {
       if (response.ok) {
         // If the request is successful
         setSuccess(true)
+        toast.success('Customization request sent successfully!')
       } else {
         // Handle error response
         console.error('Error sending customization:', await response.text())
@@ -52,7 +53,7 @@ function SubmitButton() {
         toast.error('Failed to send customization request.')
       }
     } catch (error) {
-      console.error("Error sending customization:", error)
+      console.error('Error sending customization:', error)
       setSuccess(false)
     } finally {
       setLoading(false)

@@ -17,7 +17,7 @@ import type { UpdateProductVariantRequest } from "@/types/product-variant"
 export default function EditProductVariantPage() {
   const params = useParams()
   const router = useRouter()
-  const variantId = params.id as string
+  const variantId = params?.id as string
 
   const { getProductVariantById, updateProductVariant, isLoading, selectedVariant } = useProductVariantStore()
 

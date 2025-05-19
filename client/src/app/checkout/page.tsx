@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Bounded } from "@/components/Bounded"
 import { Heading } from "@/components/Heading"
@@ -69,7 +68,8 @@ const paymentMethodNames: Record<PaymentMethod, string> = {
   [PaymentMethod.OTHER]: "Other",
 }
 
-export default function CheckoutPage() {
+// Checkout content component that uses useSearchParams
+function CheckoutContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { authUser, fetchAuthUser } = useAuthStore()
@@ -107,7 +107,7 @@ export default function CheckoutPage() {
         await getMyCart()
 
         // Get selected items from URL
-        const itemsParam = searchParams.get("items")
+        const itemsParam = searchParams?.get("items")
         if (!itemsParam) {
           toast.error("No items selected for checkout")
           router.push("/cart")
@@ -248,14 +248,13 @@ export default function CheckoutPage() {
   }
 
   return (
-<>
-<Header/>
+    <>
+      <Header />
 
-<div className="h-24 md:h-32 bg-brand-gray" /> 
+      <div className="h-24 md:h-32 bg-brand-gray" />
 
-
-    <Bounded className="min-h-screen bg-brand-gray py-16">
-          <h1
+      <Bounded className="min-h-screen bg-brand-gray py-16">
+        <h1
           className={clsx(
             'text-[3rem] md:text-[4rem] font-dancing tracking-tight text-brand-purple drop-shadow-md transition-all duration-700 text-center mb-8'
           )}
@@ -263,227 +262,247 @@ export default function CheckoutPage() {
           CHECKOUT
         </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
-        <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit} className="space-y-10">
-            {/* Shipping Address */}
-            <div className="bg-white rounded-none border border-brand-pink/20 p-8">
-              <h2 className="text-2xl font-cormorant mb-8 text-brand-purple">Shipping Address</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
+          <div className="lg:col-span-2">
+            <form onSubmit={handleSubmit} className="space-y-10">
+              {/* Shipping Address */}
+              <div className="bg-white rounded-none border border-brand-pink/20 p-8">
+                <h2 className="text-2xl font-cormorant mb-8 text-brand-purple">Shipping Address</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="houseNumber" className="font-cormorant text-base">
-                    House/Apartment Number
-                  </Label>
-                  <Input
-                    id="houseNumber"
-                    name="houseNumber"
-                    value={formData.houseNumber}
-                    onChange={handleInputChange}
-                    placeholder="123"
-                    required
-                    className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
-                  />
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="houseNumber" className="font-cormorant text-base">
+                      House/Apartment Number
+                    </Label>
+                    <Input
+                      id="houseNumber"
+                      name="houseNumber"
+                      value={formData.houseNumber}
+                      onChange={handleInputChange}
+                      placeholder="123"
+                      required
+                      className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="streetName" className="font-cormorant text-base">
-                    Street Name
-                  </Label>
-                  <Input
-                    id="streetName"
-                    name="streetName"
-                    value={formData.streetName}
-                    onChange={handleInputChange}
-                    placeholder="Main Street"
-                    required
-                    className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="streetName" className="font-cormorant text-base">
+                      Street Name
+                    </Label>
+                    <Input
+                      id="streetName"
+                      name="streetName"
+                      value={formData.streetName}
+                      onChange={handleInputChange}
+                      placeholder="Main Street"
+                      required
+                      className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="city" className="font-cormorant text-base">
-                    City
-                  </Label>
-                  <Input
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    placeholder="New York"
-                    required
-                    className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city" className="font-cormorant text-base">
+                      City
+                    </Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      placeholder="New York"
+                      required
+                      className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="state" className="font-cormorant text-base">
-                    State/Province
-                  </Label>
-                  <Input
-                    id="state"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    placeholder="NY"
-                    required
-                    className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="state" className="font-cormorant text-base">
+                      State/Province
+                    </Label>
+                    <Input
+                      id="state"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleInputChange}
+                      placeholder="NY"
+                      required
+                      className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="country" className="font-cormorant text-base">
-                    Country
-                  </Label>
-                  <Input
-                    id="country"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleInputChange}
-                    placeholder="United States"
-                    required
-                    className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="country" className="font-cormorant text-base">
+                      Country
+                    </Label>
+                    <Input
+                      id="country"
+                      name="country"
+                      value={formData.country}
+                      onChange={handleInputChange}
+                      placeholder="United States"
+                      required
+                      className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="postalCode" className="font-cormorant text-base">
-                    Postal Code
-                  </Label>
-                  <Input
-                    id="postalCode"
-                    name="postalCode"
-                    value={formData.postalCode}
-                    onChange={handleInputChange}
-                    placeholder="10001"
-                    required
-                    className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="postalCode" className="font-cormorant text-base">
+                      Postal Code
+                    </Label>
+                    <Input
+                      id="postalCode"
+                      name="postalCode"
+                      value={formData.postalCode}
+                      onChange={handleInputChange}
+                      placeholder="10001"
+                      required
+                      className="border-brand-pink/20 rounded-none focus:border-brand-purple focus:ring-brand-purple/10"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Delivery Method */}
-            <div className="bg-white rounded-none border border-brand-pink/20 p-8">
-              <h2 className="text-2xl font-cormorant mb-8 text-brand-purple">Delivery Method</h2>
+              {/* Delivery Method */}
+              <div className="bg-white rounded-none border border-brand-pink/20 p-8">
+                <h2 className="text-2xl font-cormorant mb-8 text-brand-purple">Delivery Method</h2>
 
-              <RadioGroup
-                value={formData.deliveryMethod}
-                onValueChange={handleDeliveryMethodChange}
-                className="space-y-4"
-              >
-                {Object.values(DeliveryMethod).map((method) => (
-                  <div
-                    key={method}
-                    className="flex items-center space-x-2 border border-brand-pink/20 p-4 hover:bg-brand-pink/5 transition-colors"
-                  >
-                    <RadioGroupItem value={method} id={`delivery-${method}`} className="text-brand-purple" />
-                    <Label
-                      htmlFor={`delivery-${method}`}
-                      className="flex-grow flex justify-between font-cormorant text-base"
+                <RadioGroup
+                  value={formData.deliveryMethod}
+                  onValueChange={handleDeliveryMethodChange}
+                  className="space-y-4"
+                >
+                  {Object.values(DeliveryMethod).map((method) => (
+                    <div
+                      key={method}
+                      className="flex items-center space-x-2 border border-brand-pink/20 p-4 hover:bg-brand-pink/5 transition-colors"
                     >
-                      <span>{deliveryMethodNames[method]}</span>
-                      <span className="font-medium">{formatCurrency(deliveryMethodFees[method])}</span>
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-
-            {/* Payment Method */}
-            <div className="bg-white rounded-none border border-brand-pink/20 p-8">
-              <h2 className="text-2xl font-cormorant mb-8 text-brand-purple">Payment Method</h2>
-
-              <RadioGroup
-                value={formData.paymentMethod}
-                onValueChange={handlePaymentMethodChange}
-                className="space-y-4"
-              >
-                {Object.values(PaymentMethod).map((method) => (
-                  <div
-                    key={method}
-                    className="flex items-center space-x-2 border border-brand-pink/20 p-4 hover:bg-brand-pink/5 transition-colors"
-                  >
-                    <RadioGroupItem value={method} id={`payment-${method}`} className="text-brand-purple" />
-                    <Label htmlFor={`payment-${method}`} className="flex-grow font-cormorant text-base">
-                      {paymentMethodNames[method]}
-                      {method !== PaymentMethod.CASH && (
-                        <span className="text-xs text-gray-500 block mt-1 font-sans">
-                          You'll be redirected to our secure payment provider
-                        </span>
-                      )}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-          </form>
-        </div>
-
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-none border border-brand-pink/20 p-8 sticky top-24 space-y-8">
-            <h2 className="text-2xl font-cormorant text-brand-purple">Order Summary</h2>
-
-            {/* Selected Items */}
-            <div className="space-y-4">
-              <h3 className="font-cormorant text-lg text-brand-purple">Items ({selectedCartItems.length})</h3>
-
-              <div className="max-h-60 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-brand-pink scrollbar-track-brand-pink/10">
-                {selectedCartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between border-b border-brand-pink/10 pb-3">
-                    <div>
-                      <p className="font-cormorant text-base">{item.productName}</p>
-                      <p className="text-sm text-gray-500 font-sans">
-                        {item.variantName} × {item.quantity}
-                      </p>
+                      <RadioGroupItem value={method} id={`delivery-${method}`} className="text-brand-purple" />
+                      <Label
+                        htmlFor={`delivery-${method}`}
+                        className="flex-grow flex justify-between font-cormorant text-base"
+                      >
+                        <span>{deliveryMethodNames[method]}</span>
+                        <span className="font-medium">{formatCurrency(deliveryMethodFees[method])}</span>
+                      </Label>
                     </div>
-                    <p className="font-cormorant text-base">{formatCurrency(item.price * item.quantity)}</p>
-                  </div>
-                ))}
+                  ))}
+                </RadioGroup>
               </div>
+
+              {/* Payment Method */}
+              <div className="bg-white rounded-none border border-brand-pink/20 p-8">
+                <h2 className="text-2xl font-cormorant mb-8 text-brand-purple">Payment Method</h2>
+
+                <RadioGroup
+                  value={formData.paymentMethod}
+                  onValueChange={handlePaymentMethodChange}
+                  className="space-y-4"
+                >
+                  {Object.values(PaymentMethod).map((method) => (
+                    <div
+                      key={method}
+                      className="flex items-center space-x-2 border border-brand-pink/20 p-4 hover:bg-brand-pink/5 transition-colors"
+                    >
+                      <RadioGroupItem value={method} id={`payment-${method}`} className="text-brand-purple" />
+                      <Label htmlFor={`payment-${method}`} className="flex-grow font-cormorant text-base">
+                        {paymentMethodNames[method]}
+                        {method !== PaymentMethod.CASH && (
+                          <span className="text-xs text-gray-500 block mt-1 font-sans">
+                            You'll be redirected to our secure payment provider
+                          </span>
+                        )}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            </form>
+          </div>
+
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-none border border-brand-pink/20 p-8 sticky top-24 space-y-8">
+              <h2 className="text-2xl font-cormorant text-brand-purple">Order Summary</h2>
+
+              {/* Selected Items */}
+              <div className="space-y-4">
+                <h3 className="font-cormorant text-lg text-brand-purple">Items ({selectedCartItems.length})</h3>
+
+                <div className="max-h-60 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-brand-pink scrollbar-track-brand-pink/10">
+                  {selectedCartItems.map((item) => (
+                    <div key={item.id} className="flex justify-between border-b border-brand-pink/10 pb-3">
+                      <div>
+                        <p className="font-cormorant text-base">{item.productName}</p>
+                        <p className="text-sm text-gray-500 font-sans">
+                          {item.variantName} × {item.quantity}
+                        </p>
+                      </div>
+                      <p className="font-cormorant text-base">{formatCurrency(item.price * item.quantity)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Summary */}
+              <div className="space-y-3 font-cormorant">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span>{formatCurrency(calculateSubtotal())}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Shipping</span>
+                  <span>{formatCurrency(calculateDeliveryFee())}</span>
+                </div>
+                <div className="border-t border-brand-pink/20 pt-3 mt-3 flex justify-between font-medium text-lg">
+                  <span>Total</span>
+                  <span>{formatCurrency(calculateTotal())}</span>
+                </div>
+              </div>
+
+              {/* Place Order Button */}
+              <Button
+                className="w-full bg-brand-purple text-white hover:bg-brand-purple/90 py-6 rounded-none font-cormorant text-lg"
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
+                {isLoading
+                  ? "Processing..."
+                  : formData.paymentMethod === PaymentMethod.CASH
+                    ? "Place Order"
+                    : "Proceed to Payment"}
+              </Button>
+
+              <button
+                type="button"
+                onClick={() => router.push("/cart")}
+                className="w-full text-center text-brand-purple hover:text-brand-purple/80 font-cormorant text-base"
+              >
+                Return to Cart
+              </button>
             </div>
-
-            {/* Price Summary */}
-            <div className="space-y-3 font-cormorant">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span>{formatCurrency(calculateSubtotal())}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
-                <span>{formatCurrency(calculateDeliveryFee())}</span>
-              </div>
-              <div className="border-t border-brand-pink/20 pt-3 mt-3 flex justify-between font-medium text-lg">
-                <span>Total</span>
-                <span>{formatCurrency(calculateTotal())}</span>
-              </div>
-            </div>
-
-            {/* Place Order Button */}
-            <Button
-              className="w-full bg-brand-purple text-white hover:bg-brand-purple/90 py-6 rounded-none font-cormorant text-lg"
-              onClick={handleSubmit}
-              disabled={isLoading}
-            >
-              {isLoading
-                ? "Processing..."
-                : formData.paymentMethod === PaymentMethod.CASH
-                  ? "Place Order"
-                  : "Proceed to Payment"}
-            </Button>
-
-            <button
-              type="button"
-              onClick={() => router.push("/cart")}
-              className="w-full text-center text-brand-purple hover:text-brand-purple/80 font-cormorant text-base"
-            >
-              Return to Cart
-            </button>
           </div>
         </div>
-      </div>
-    </Bounded>
-    <NormalFooter/>
+      </Bounded>
+      <NormalFooter />
     </>
+  )
+}
+
+// Main page component
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <>
+        <Header />
+        <div className="h-24 md:h-32 bg-brand-gray" />
+        <Bounded className="min-h-screen bg-[#fffdf9] py-16">
+          <div className="flex justify-center items-center h-64">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-brand-pink border-t-brand-purple"></div>
+          </div>
+        </Bounded>
+        <NormalFooter />
+      </>
+    }>
+      <CheckoutContent />
+    </Suspense>
   )
 }

@@ -17,7 +17,7 @@ import { DashboardHeader } from "@/components/admin/dashboard-header"
 export default function EditUserPage() {
   const params = useParams()
   const router = useRouter()
-  const userId = params.id as string
+  const userId = params?.id as string
 
   const { selectedUser, isLoading, fetchUserById, updateUser } = useUserStore()
 

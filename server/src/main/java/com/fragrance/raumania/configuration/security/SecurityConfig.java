@@ -33,7 +33,7 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/webjars/**",
             "/api/auth/**",
-            "api/chatbot/**",
+            "/api/chatbot/**",
     };
 
     private final String[] ADMIN_ENDPOINTS = {

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BarChart3, Box, ShoppingCart, Star, Tag, User, Users, Menu, X } from "lucide-react"
+import { BarChart3, Box, ShoppingCart, Star, Tag, User, Users, Menu, X, Home } from "lucide-react"
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -36,6 +36,7 @@ export function Sidebar() {
   // Navigation items grouped by section
   const navigationItems = {
     general: [
+      { href: "/", label: "Home", icon: <Home size={18} /> },
       { href: "/admin", label: "Dashboard", icon: <BarChart3 size={18} /> },
       { href: "/admin/product-list", label: "Products", icon: <Box size={18} /> },
       { href: "/admin/brands", label: "Brands", icon: <Tag size={18} /> },
